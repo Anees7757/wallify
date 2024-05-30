@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   late SharedPreferences _prefs;
   Set<String> favoritePhotos = {};
   bool _isUiVisible = true;
+  bool _isSettingWallpaper = false;
 
   @override
   void initState() {
@@ -41,16 +44,24 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   }
 
   setWallpaper(int id) async {
+    setState(() {
+      _isSettingWallpaper = true;
+    });
+
     var file = await DefaultCacheManager().getSingleFile(widget.photo.url);
     bool result = await WallpaperHandler.instance
         .setWallpaperFromFile(file.path, _getWallpaperLocation(id));
 
+    setState(() {
+      _isSettingWallpaper = false;
+    });
+
     print(result);
     if (!mounted) return;
-    Toast.show(context: context, 'Wallpaper Changed $result');
+    Toast.show(context: context, 'Wallpaper Changed');
   }
 
-  WallpaperLocation _getWallpaperLocation(int id) {
+  _getWallpaperLocation(int id) {
     switch (id) {
       case 0:
         return WallpaperLocation.homeScreen;
@@ -97,6 +108,12 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.black.withOpacity(0.002),
+      ),
+    );
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
@@ -175,60 +192,65 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
-              if (_isUiVisible)
-                Positioned(
-                  left: 16.0,
-                  right: 16.0,
-                  bottom: 16.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: IconButton(
-                          tooltip: 'Lock Screen',
-                          onPressed: () => setWallpaper(0),
-                          icon: const Icon(Icons.lock),
-                          color: Colors.black,
-                          iconSize: 24.0,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: IconButton(
-                          tooltip: 'Both Screens',
-                          onPressed: () => setWallpaper(1),
-                          icon: const Icon(Icons.sync_alt),
-                          color: Colors.black,
-                          iconSize: 24.0,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: IconButton(
-                          tooltip: 'Home Screen',
-                          onPressed: () => setWallpaper(2),
-                          icon: const Icon(Icons.home_filled),
-                          color: Colors.black,
-                          iconSize: 24.0,
-                        ),
-                      ),
-                    ],
+              if (_isSettingWallpaper)
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: const Center(
+                    child: CupertinoActivityIndicator(),
                   ),
                 ),
             ],
           ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: (_isUiVisible)
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: IconButton(
+                        tooltip: 'Lock Screen',
+                        onPressed: () => setWallpaper(0),
+                        icon: const Icon(Icons.lock),
+                        color: Colors.black,
+                        iconSize: 24.0,
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: IconButton(
+                        tooltip: 'Both Screens',
+                        onPressed: () => setWallpaper(1),
+                        icon: const Icon(Icons.sync_alt),
+                        color: Colors.black,
+                        iconSize: 24.0,
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: IconButton(
+                        tooltip: 'Home Screen',
+                        onPressed: () => setWallpaper(2),
+                        icon: const Icon(Icons.home_filled),
+                        color: Colors.black,
+                        iconSize: 24.0,
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox(),
         ),
       ),
     );

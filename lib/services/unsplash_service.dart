@@ -27,7 +27,6 @@ class UnsplashService {
       Uri.parse(
           '$_baseUrl/search/photos?query=$category&client_id=$access_key&per_page=$total'),
     );
-    print('total>> $total');
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
       if (data['results'] != null && data['results'].isNotEmpty) {
