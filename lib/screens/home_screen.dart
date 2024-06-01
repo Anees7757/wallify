@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:wallify/global/global.dart';
 import 'package:wallify/screens/favorites_screen.dart';
+import 'package:wallify/utils/hex_color.dart';
 import '../services/unsplash_service.dart';
 import '../models/photo.dart';
 import 'photo_detail_screen.dart';
@@ -30,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchPhotos();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
   }
 
   Future<void> _fetchPhotos() async {
@@ -67,12 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   const SystemUiOverlayStyle(
+    //     statusBarColor: Colors.transparent,
+    //     statusBarIconBrightness: Brightness.dark,
+    //   ),
+    // );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -106,10 +110,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   itemBuilder: (context, index, realIndex) {
                     final photo = recommended_photos[index];
+                    Color color = HexColor.fromHex(photo.color);
                     return Hero(
                       tag: 'photo_${photo.id}',
                       child: Container(
                         margin: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16.0),
                           child: GestureDetector(
@@ -123,10 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               );
                             },
                             child: CachedNetworkImage(
-                              imageUrl: photo.url,
+                              imageUrl: photo.url.regular,
                               fit: BoxFit.cover,
-                              // placeholder: (context, url) => const Center(
-                              //   child: CupertinoActivityIndicator(),
+                              // placeholder: (context, url) => Image.network(
+                              //   photo.url.raw,
+                              //   fit: BoxFit.cover,
                               // ),
                               errorWidget: (context, url, error) =>
                                   const Icon(Icons.error),

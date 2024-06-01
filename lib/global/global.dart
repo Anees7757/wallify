@@ -8,7 +8,7 @@ final List<String> categories = [
   'Animals',
   'Foods',
   'Nature',
-  'Cars',
+  'Super Cars',
   'Sunset',
   'Fashion',
   'Sports',

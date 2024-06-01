@@ -6,14 +6,14 @@ import 'package:wallify/screens/home_screen.dart';
 import 'package:wallify/screens/route_screen.dart';
 import 'package:wallify/services/unsplash_service.dart';
 import 'package:flutter/services.dart';
+import 'dart:isolate';
 
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -21,13 +21,17 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   _navigateToHome() async {
-    await _fetchRecommendedPhotos();
-    await _fetchCategoryPhotos();
+    await _fetchData();
     // await Future.delayed(const Duration(seconds: 4), () {});
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => HomeScreen()),
     );
+  }
+
+  Future<void> _fetchData() async {
+    await _fetchRecommendedPhotos();
+    await _fetchCategoryPhotos();
   }
 
   Future<void> _fetchCategoryPhotos() async {
@@ -38,6 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
                 .fetchCategoryPhotos(category, 1);
         category_photos.add(photos[0]);
       }
+      print(category_photos);
     } catch (error) {
       print(error);
     }
@@ -49,6 +54,7 @@ class _SplashScreenState extends State<SplashScreen>
           .fetchPhotos(5);
 
       recommended_photos = photos;
+      print(recommended_photos);
     } catch (error) {
       print(error);
     }
@@ -82,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ],
           isRepeatingAnimation: true,
-          totalRepeatCount: 10,
+          totalRepeatCount: 30,
         ),
       ),
     );

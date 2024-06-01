@@ -7,9 +7,17 @@ class UnsplashService {
   static const String _baseUrl = 'https://api.unsplash.com';
 
   Future<List<Photo>> fetchPhotos(int total) async {
+    List<String> quries = [
+      'flowers',
+      'landscapes',
+      'mountains',
+      'forests',
+      'moon',
+      'stars'
+    ];
     final response = await http.get(
       Uri.parse(
-          '$_baseUrl/photos/?client_id=$access_key&order_by=ORDER&per_page=$total'),
+          '$_baseUrl/photos?query=${quries.join(',')}&client_id=$access_key&order_by=popular&per_page=$total&count=$total&orientation=portrait'),
     );
 
     if (response.statusCode == 200) {
@@ -23,10 +31,9 @@ class UnsplashService {
   Future<List<Photo>> fetchCategoryPhotos(String category, int total) async {
     List<Photo> photos = [];
 
-    final response = await http.get(
-      Uri.parse(
-          '$_baseUrl/search/photos?query=$category&client_id=$access_key&per_page=$total'),
-    );
+    final response = await http.get(Uri.parse(
+        '$_baseUrl/search/photos?query=$category&client_id=$access_key&per_page=$total&count=$total&orientation=portrait'));
+
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
       if (data['results'] != null && data['results'].isNotEmpty) {

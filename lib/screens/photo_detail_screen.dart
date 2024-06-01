@@ -29,14 +29,15 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   void initState() {
     super.initState();
     _initSharedPreferences();
+    _systemNavBarChange();
     _updateSystemUi();
   }
 
   _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
-    setState(() {
-      favoritePhotos = (_prefs.getStringList('favoritePhotos') ?? []).toSet();
-    });
+    // setState(() {
+    favoritePhotos = (_prefs.getStringList('favoritePhotos') ?? []).toSet();
+    // });
   }
 
   _saveFavoritePhotos() {
@@ -48,9 +49,21 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       _isSettingWallpaper = true;
     });
 
-    var file = await DefaultCacheManager().getSingleFile(widget.photo.url);
-    bool result = await WallpaperHandler.instance
-        .setWallpaperFromFile(file.path, _getWallpaperLocation(id));
+    final Size screenSize = MediaQuery.of(context).size;
+
+    var file =
+        await DefaultCacheManager().getSingleFile(widget.photo.url.regular);
+    final double centerX = widget.photo.width / 2;
+    final double centerY = widget.photo.height / 2;
+    bool result = await WallpaperHandler.instance.setWallpaperFromFile(
+      file.path,
+      _getWallpaperLocation(id),
+      cropBounds: Rect.fromCenter(
+        center: Offset(centerX, centerY),
+        width: screenSize.width,
+        height: screenSize.height,
+      ),
+    );
 
     setState(() {
       _isSettingWallpaper = false;
@@ -99,24 +112,31 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 
   _updateSystemUi() {
     // if (_isUiVisible) {
-    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-    //       overlays: SystemUiOverlay.values);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+    //     overlays: SystemUiOverlay.values);
     // } else {
-    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     // }
+    // setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
+  _systemNavBarChange() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         systemNavigationBarColor: Colors.black.withOpacity(0.002),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _systemNavBarChange();
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+            overlays: SystemUiOverlay.values);
         return true;
       },
       child: GestureDetector(
@@ -184,10 +204,11 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                 child: CachedNetworkImage(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
-                  imageUrl: widget.photo.url,
+                  imageUrl: widget.photo.url.regular,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CupertinoActivityIndicator(),
+                  placeholder: (context, url) => Image.network(
+                    widget.photo.url.thumb,
+                    fit: BoxFit.cover,
                   ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),

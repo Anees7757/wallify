@@ -9,6 +9,8 @@ import 'package:wallify/screens/category_detail_screen.dart';
 import 'package:wallify/services/unsplash_service.dart';
 import 'dart:ui';
 
+import '../utils/hex_color.dart';
+
 class CategoriesScreen extends StatefulWidget {
   @override
   State<CategoriesScreen> createState() => _CategoriesScreenState();
@@ -35,24 +37,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 .fetchCategoryPhotos(category, 1);
         category_photos.add(photos[0]);
       }
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      _isLoading = false;
+      // });
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      _isLoading = false;
+      // });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   const SystemUiOverlayStyle(
+    //     statusBarColor: Colors.transparent,
+    //     statusBarIconBrightness: Brightness.dark,
+    //   ),
+    // );
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -84,6 +86,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               physics: const BouncingScrollPhysics(),
               itemCount: categories.length,
               itemBuilder: (context, index) {
+                Color color = HexColor.fromHex(category_photos[index].color);
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -95,19 +98,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     );
                   },
                   child: Container(
-                    height: 100,
+                    height: 120,
                     margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: CachedNetworkImage(
-                            imageUrl: category_photos[index].url,
+                            imageUrl: category_photos[index].url.thumb,
                             fit: BoxFit.cover,
-                            // placeholder: (context, url) => const Center(
-                            //   child: CupertinoActivityIndicator(),
-                            // ),
+                            placeholder: (context, url) => Image.network(
+                              category_photos[index].url.thumb,
+                              fit: BoxFit.cover,
+                            ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
                           ),

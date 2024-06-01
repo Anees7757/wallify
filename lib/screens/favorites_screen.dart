@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wallify/utils/hex_color.dart';
 import '../models/photo.dart';
 import '../services/unsplash_service.dart';
 import 'photo_detail_screen.dart';
@@ -57,12 +58,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   const SystemUiOverlayStyle(
+    //     statusBarColor: Colors.transparent,
+    //     statusBarIconBrightness: Brightness.dark,
+    //   ),
+    // );
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -107,6 +108,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     itemCount: _favoritePhotos.length,
                     itemBuilder: (BuildContext context, int index) {
                       final photo = _favoritePhotos[index];
+                      Color color = HexColor.fromHex(photo.color);
+
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -123,13 +126,19 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                             }
                           });
                         },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
-                          child: CachedNetworkImage(
-                            imageUrl: photo.url,
-                            fit: BoxFit.cover,
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: CachedNetworkImage(
+                              imageUrl: photo.url.thumb,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            ),
                           ),
                         ),
                       );

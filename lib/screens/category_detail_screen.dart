@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:wallify/utils/hex_color.dart';
 import '../models/photo.dart';
 import '../services/unsplash_service.dart';
 import 'photo_detail_screen.dart';
@@ -31,26 +32,22 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   Future<void> _fetchCategoryPhotos() async {
     try {
       final photos = await Provider.of<UnsplashService>(context, listen: false)
-          .fetchCategoryPhotos(widget.category, 50);
-      setState(() {
-        _photos = photos;
-        _isLoading = false;
-      });
+          .fetchCategoryPhotos(widget.category, 30);
+      _photos = photos;
+      _isLoading = false;
     } catch (error) {
-      setState(() {
-        _isLoading = false;
-      });
+      _isLoading = false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   const SystemUiOverlayStyle(
+    //     statusBarColor: Colors.transparent,
+    //     statusBarIconBrightness: Brightness.dark,
+    //   ),
+    // );
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -86,6 +83,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                 itemCount: _photos.length,
                 itemBuilder: (BuildContext context, int index) {
                   final photo = _photos[index];
+                  Color color = HexColor.fromHex(photo.color);
                   return Hero(
                     tag: 'photo_${photo.id}',
                     child: GestureDetector(
@@ -98,16 +96,22 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                           ),
                         );
                       },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12.0),
-                        child: CachedNetworkImage(
-                          imageUrl: photo.url,
-                          fit: BoxFit.cover,
-                          // placeholder: (context, url) => const Center(
-                          //   child: CupertinoActivityIndicator(),
-                          // ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: CachedNetworkImage(
+                            imageUrl: photo.url.thumb,
+                            fit: BoxFit.cover,
+                            // placeholder: (context, url) => const Center(
+                            //   child: CupertinoActivityIndicator(),
+                            // ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
                         ),
                       ),
                     ),
