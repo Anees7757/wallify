@@ -1,16 +1,52 @@
-# wallify
+# Wallify
 
-A new Flutter project.
+Wallify is a beautifully designed wallpaper app that provides users with a wide range of high-quality wallpapers. The app includes smooth animations and an intuitive UI, allowing users to set wallpapers to their home screen, lock screen, or both with ease.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- **High-Quality Wallpapers**: Browse and download a vast collection of high-resolution wallpapers.
+- **Beautiful UI**: Enjoy a clean and aesthetically pleasing user interface.
+- **Smooth Animations**: Experience fluid and engaging animations throughout the app.
+- **Wallpaper Settings**: Set wallpapers to your home screen, lock screen, or both.
+- **Favorites**: Save your favorite wallpapers for quick access.
+- **Categories**: Explore wallpapers categorized by themes and styles.
+- **Search**: Find specific wallpapers using the search functionality.
+- **Unsplash API Integration**: Fetch wallpapers from the Unsplash API.
 
-A few resources to get you started if this is your first Flutter project:
+## Technologies Used
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Frontend**: Flutter (for mobile interface)
+- **Backend**: Unsplash API for fetching wallpapers
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+### Prerequisites
+
+- [Flutter](https://flutter.dev/docs/get-started/install)
+
+### Setup
+
+1. Clone the repository
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/wallify.git
+    cd wallify
+    ```
+
+2. Install dependencies
+    ```bash
+    flutter pub get
+    ```
+
+3. Set up the Unsplash API
+    - Create an account on [Unsplash](https://unsplash.com/developers)
+    - Create a new application to get your API key
+    - Add your Unsplash API key to your Flutter project
+
+### Android
+
+Make sure following permissions are included and configurations in `android/app/src/main/AndroidManifest.xml`:
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.SET_WALLPAPER"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
